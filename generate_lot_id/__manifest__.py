@@ -4,7 +4,7 @@
 
 {
     'name': 'Generate Lot ID',
-    'version': '15.0.0.0.0',
+    'version': '15.0.0.0',
     'license': 'LGPL-3',
     'author': 'AHDTECH . ENG:Mohanad Alkrunz',
     'category': 'Inventory',
