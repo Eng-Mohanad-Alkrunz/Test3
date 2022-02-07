@@ -12,20 +12,24 @@ import string
 import re
 import logging
 
-
-
 class ProductTemplate(models.Model):
     _inherit = "product.template"
     lot_abbv = fields.Char('Lot Code Format', help='To assist with manufacturing, '
                                 'lot codes will automatically generate with this prefix.\n'
                                 'You can add other pieces to be generated, such as \n'
                                 '- [DATE]\n yyyymmdd'
-                                '- [JULIAN] - Julian date code\n'
-                                '- [JULIAN_DAY] - Julian day\n'
-                                '- [YEARYY] - Last two digits of year\n'
-                                '- [MONTH] - 01-12 Month\n'
-                                '- [DAY] - 01-31 Day\n'
-                                '- [YEAR] - Full year\n' 
+                               '- [JULIAN] - Julian date code\n'
+                               '- [JULIAN_DAY] - Julian day\n'
+                               '- [YEARYY] - Last two digits of year\n'
+                               '- [MONTH] - 01-12 Month\n'
+                               '- [MM] - 01-12 Month\n' 
+                               '- [DAY] - 01-31 Day\n'
+                               '- [DD] - 01-31 Day\n' 
+                               '- [YEAR] - Full year\n' 
+                               '- [YY] - Full year\n' 
+                               '-[YYMMDD] - YearMonthDay\n'
+                               '-[DDMMYY] - DayMonthYear\n'
+                               '-[MMDDYY] - MonthDayYear\n'
                                 '- [OPERATION_CODE] - Manufacturing Operation Code\n'                                
                                 '- [WAREHOUSE_CODE] - Warehouse Code\n'
                                 '- [USER_DEFINED] - Variable will be entered by user when creating lot\n'         
@@ -158,7 +162,6 @@ class ProductProduct(models.Model):
 
         # TODO: Replace any sequential dashes with single dashes.
         return lot_name
-
 
 class MrpProduction(models.Model):
     _inherit = 'mrp.production'
