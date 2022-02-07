@@ -11,9 +11,9 @@
                 <field name="arch" type="xml">
 
                     <field name="default_code" position="after">
-                         Inventory Codes
-                        <div>
 
+                        <div>
+                            <b>Inventory Codes</b>
                         <field name="lot_abbv" />
                     </div>
 
