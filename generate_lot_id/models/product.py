@@ -61,12 +61,14 @@ class ProductProduct(models.Model):
         if "[000]" in lot_name:
             cr = self.env.cr
             sql = """
-                SELECT last_lot_idx FROM product_product
-                where last_lot_idx is not NULL
-                ORDER BY last_lot_idx DESC  """
+                    SELECT last_lot_idx FROM product_product
+                    where last_lot_idx is not NULL
+                    ORDER BY last_lot_idx DESC  """
             cr.execute(sql)
             response = cr.dictfetchall()
             _logger = logging.getLogger(__name__)
+            logging.info(response)
+            logging.info(self.id)
             if len(response) > 0:
                 last_index = response[0]['last_lot_idx']
                 if last_index is None:
@@ -81,12 +83,21 @@ class ProductProduct(models.Model):
                         last_index = str(last_index)
                 lot_name = str.replace(lot_name, '[000]', last_index, 1)
                 self.env.cr.execute(f"""
-                                Update  product_product
-                                SET last_lot_idx= '{last_index}'
-                                where id = '{self.id}'
-                                """)
+                                    Update  product_product
+                                    SET last_lot_idx= '{last_index}'
+                                    where id = '{self.id}'
+                                    """)
+
+
+
+
             else:
                 lot_name = str.replace(lot_name, '[000]', "001", 1)
+                self.env.cr.execute(f"""
+                                                    Update  product_product
+                                                    SET last_lot_idx= '002'
+                                                    where id = '{self.id}'
+                                                    """)
 
         lot_name = str.replace(lot_name, '[JULIAN]',
                                '%d%03d' % (gen_date.timetuple().tm_year, gen_date.timetuple().tm_yday), 1)
