@@ -10,6 +10,7 @@
     'category': 'Inventory',
     'depends': ['product','mrp', 'product_expiry'],
     'data': [
+        'views/product.xml'
     ],
     'installable': True,
     'application': True,
