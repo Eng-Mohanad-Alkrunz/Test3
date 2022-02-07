@@ -39,6 +39,117 @@ class MrpWorkOrder(models.Model):
 
     select_lot_ids = fields.Many2many('stock.production.lot', string='Select Lot Codes', store=False, create_edit=False, help='Select a lot code to add to this workorder.')
 
+class ProductProduct(models.Model):
+    _inherit = "product.product"
+    last_lot_idx = fields.Char('Last lot index', help='Returns Last idx')
+
+    @api.model
+    def gen_lot_code(self, user_defined='', gen_date=datetime.now()):
+        if self.lot_abbv is False:
+            # If no format is specified.
+            julian = '%d%03d' % (gen_date.timetuple().tm_year, gen_date.timetuple().tm_yday)
+            if self.default_code is not False:
+                return str(self.default_code) + str('-') + julian
+            else:
+                return julian
+
+        if self.env.context.get('tz', False):
+            gen_date = gen_date.replace(tzinfo=tz.tzutc())
+            gen_date = gen_date.astimezone(tz.gettz(self.env.context['tz']))
+
+        lot_name = self.lot_abbv
+        if "[000]" in lot_name:
+            cr = self.env.cr
+            sql = """
+                SELECT last_lot_idx FROM product_product
+                where last_lot_idx is not NULL
+                ORDER BY last_lot_idx DESC  """
+            cr.execute(sql)
+            response = cr.dictfetchall()
+            _logger = logging.getLogger(__name__)
+            if len(response) > 0:
+                last_index = response[0]['last_lot_idx']
+                if last_index is None:
+                    last_index = "001"
+                else:
+                    last_index = int(last_index) + 1
+                    if last_index < 10:
+                        last_index = "00" + str(last_index)
+                    elif last_index >= 10 and last_index <= 99:
+                        last_index = "0" + str(last_index)
+                    else:
+                        last_index = str(last_index)
+                lot_name = str.replace(lot_name, '[000]', last_index, 1)
+                self.env.cr.execute(f"""
+                                Update  product_product
+                                SET last_lot_idx= '{last_index}'
+                                where id = '{self.id}'
+                                """)
+            else:
+                lot_name = str.replace(lot_name, '[000]', "001", 1)
+
+        lot_name = str.replace(lot_name, '[JULIAN]',
+                               '%d%03d' % (gen_date.timetuple().tm_year, gen_date.timetuple().tm_yday), 1)
+        lot_name = str.replace(lot_name, '[JULIAN_DAY]', str(gen_date.timetuple().tm_yday).zfill(3), 1)
+        lot_name = str.replace(lot_name, '[YEARYY]', gen_date.strftime("%y"), 1)
+        lot_name = str.replace(lot_name, '[YEAR]', gen_date.strftime("%Y"), 1)
+        lot_name = str.replace(lot_name, '[YYYY]', gen_date.strftime("%Y"), 1)
+        lot_name = str.replace(lot_name, '[STATION_CODE]', '', 1)
+        lot_name = str.replace(lot_name, '[DATE]', fields.Date.to_string(gen_date), 1)
+
+        lot_name = str.replace(lot_name, '[MMDDYY]',
+                               gen_date.strftime("%m").zfill(2) + gen_date.strftime("%d").zfill(2) + gen_date.strftime(
+                                   "%Y"), 1)
+        lot_name = str.replace(lot_name, '[DDMMYY]',
+                               gen_date.strftime("%d").zfill(2) + gen_date.strftime("%m").zfill(2) + gen_date.strftime(
+                                   "%Y"), 1)
+        lot_name = str.replace(lot_name, '[YYMMDD]',
+                               gen_date.strftime("%Y") + gen_date.strftime("%m").zfill(2) + gen_date.strftime(
+                                   "%d").zfill(2), 1)
+
+        lot_name = str.replace(lot_name, '[DAY]', gen_date.strftime("%d").zfill(2), 1)
+        lot_name = str.replace(lot_name, '[DD]', gen_date.strftime("%d").zfill(2), 1)
+        lot_name = str.replace(lot_name, '[MONTH]', gen_date.strftime("%m").zfill(2), 1)
+        lot_name = str.replace(lot_name, '[MM]', gen_date.strftime("%m").zfill(2), 1)
+        lot_name = str.replace(lot_name, '[SECOND]', gen_date.strftime("%S").zfill(2), 1)
+        lot_name = str.replace(lot_name, '[HOUR]', gen_date.strftime("%H").zfill(2), 1)
+        lot_name = str.replace(lot_name, '[MINUTE]', gen_date.strftime("%M").zfill(2), 1)
+
+        # TODO: implement STATION_CODE and WAREHOUSE_CODE
+        # lot_name = str.replace(lot_name, '[STATION_CODE]', '', 1)
+
+        context = dict(self._context or {})
+
+        if context.get('default_workorder_id', False) is not False:
+            workorder_id = self.env['mrp.workorder'].browse(context.get('default_workorder_id', False))
+            if workorder_id.production_id.picking_type_id.lot_abbv:
+                lot_name = str.replace(lot_name, '[OPERATION_CODE]',
+                                       workorder_id.production_id.picking_type_id.lot_abbv, 1)
+            if workorder_id.production_id.picking_type_id.warehouse_id.lot_abbv:
+                lot_name = str.replace(lot_name, '[WAREHOUSE_CODE]',
+                                       workorder_id.production_id.picking_type_id.warehouse_id.lot_abbv, 1)
+            if workorder_id.workcenter_id.lot_abbv:
+                lot_name = str.replace(lot_name, '[WORKCENTER_CODE]', workorder_id.workcenter_id.lot_abbv, 1)
+        if context.get('default_production_id', False) is not False:
+            production_id = self.env['mrp.production'].browse(context.get('default_production_id', False))
+            if production_id.picking_type_id.lot_abbv:
+                lot_name = str.replace(lot_name, '[OPERATION_CODE]', production_id.picking_type_id.lot_abbv, 1)
+            if production_id.picking_type_id.warehouse_id.lot_abbv:
+                lot_name = str.replace(lot_name, '[WAREHOUSE_CODE]',
+                                       production_id.picking_type_id.warehouse_id.lot_abbv, 1)
+            # If on a production order, we should only do it if there is one workorder, one workcenter..
+            if len(production_id.workorder_ids) == 1 and production_id.workorder_ids.workcenter_id.lot_abbv:
+                lot_name = str.replace(lot_name, '[WORKCENTER_CODE]',
+                                       production_id.workorder_ids.workcenter_id.lot_abbv, 1)
+
+        if user_defined:
+            # lot_name = str.replace(lot_name, '[USER_DEFINED]', user_defined, 1)
+            lot_name = self._regex(lotcode=lot_name, search=r'\[USER_DEFINED_?[\w_]*\]', user_defined=user_defined)
+
+        # TODO: Replace any sequential dashes with single dashes.
+        return lot_name
+
+
 class MrpProduction(models.Model):
     _inherit = 'mrp.production'
 
