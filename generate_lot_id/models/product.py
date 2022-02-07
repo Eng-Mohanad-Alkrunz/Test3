@@ -33,7 +33,6 @@ class ProductTemplate(models.Model):
                                 'Add an extra underscore to offer employees tips on the user defined variable, \n'
                                 'such as [USER_DEFINED_MACHINE_NUMBER], will print "Machine Number" below the field.\n')
 
-
 class MrpWorkOrder(models.Model):
     _inherit = 'mrp.workorder'
 
@@ -92,7 +91,7 @@ class ProductProduct(models.Model):
 
 
             else:
-                lot_name = str.replace(lot_name, '[000]', "001", 1)
+                lot_name = str.replace(lot_name, '[000]', "002", 1)
                 self.env.cr.execute(f"""
                                                     Update  product_product
                                                     SET last_lot_idx= '002'
