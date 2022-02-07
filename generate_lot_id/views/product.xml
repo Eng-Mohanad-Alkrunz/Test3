@@ -9,8 +9,13 @@
                 <field name="priority" eval="8" />
                 <field name="inherit_id" ref="product.product_template_only_form_view"/>
                 <field name="arch" type="xml">
+
                     <field name="default_code" position="after">
+                         <div>
+                             Inventory Codes
                         <field name="lot_abbv" />
+                    </div>
+
 <!--                        <field name="pallet_abbv" />-->
                     </field>
                 </field>

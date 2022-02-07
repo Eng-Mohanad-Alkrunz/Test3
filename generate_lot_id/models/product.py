@@ -32,3 +32,9 @@ class ProductTemplate(models.Model):
                                 'For example, CCSS-[JULIAN_DAY]-[YEARYY] will output the Julian datecode: CCSS-19118\n'
                                 'Add an extra underscore to offer employees tips on the user defined variable, \n'
                                 'such as [USER_DEFINED_MACHINE_NUMBER], will print "Machine Number" below the field.\n')
+
+
+class MrpProduction(models.Model):
+    _inherit = 'mrp.workorder'
+
+    select_lot_ids = fields.Many2many('stock.production.lot', string='Select Lot Codes', store=False, create_edit=False, help='Select a lot code to add to this workorder.')
