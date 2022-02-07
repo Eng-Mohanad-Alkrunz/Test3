@@ -34,7 +34,24 @@ class ProductTemplate(models.Model):
                                 'such as [USER_DEFINED_MACHINE_NUMBER], will print "Machine Number" below the field.\n')
 
 
-class MrpProduction(models.Model):
+class MrpWorkOrder(models.Model):
     _inherit = 'mrp.workorder'
 
     select_lot_ids = fields.Many2many('stock.production.lot', string='Select Lot Codes', store=False, create_edit=False, help='Select a lot code to add to this workorder.')
+
+class MrpProduction(models.Model):
+    _inherit = 'mrp.production'
+
+    def action_generate_serial(self):
+        self.ensure_one()
+
+        self.lot_producing_id = self.env['stock.production.lot'].create({
+            'product_id': self.product_id.id,
+            'company_id': self.company_id.id,
+            'name': self.product_id.gen_lot_code(),
+        })
+        if self.move_finished_ids.filtered(lambda m: m.product_id == self.product_id).move_line_ids:
+            self.move_finished_ids.filtered(
+                lambda m: m.product_id == self.product_id).move_line_ids.lot_id = self.lot_producing_id
+        if self.product_id.tracking == 'serial':
+            self._set_qty_producing()
