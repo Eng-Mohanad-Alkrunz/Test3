@@ -95,7 +95,7 @@ class ProductProduct(models.Model):
 
 
             else:
-                lot_name = str.replace(lot_name, '[000]', "002", 1)
+                lot_name = str.replace(lot_name, '[000]', "001", 1)
                 self.env.cr.execute(f"""
                                                     Update  product_product
                                                     SET last_lot_idx= '002'
