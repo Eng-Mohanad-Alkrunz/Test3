@@ -2,9 +2,8 @@
 <odoo>
     <data>
         <record id="product_variant_easy_edit_view_lot_code" model="ir.ui.view">
-            <field name="name">product.product.view.form.lot_code</field>
             <field name="model">product.product</field>
-            <field name="inherit_id" ref="product.product_variant_easy_edit_view" />
+            <field name="inherit_id" ref="mrp.mrp_product_template_search_view" />
            <field name="arch" type="xml">
                     <field name="property_stock_inventory" position="after">
                     <field name="tracking"/>
