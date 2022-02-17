@@ -6,7 +6,9 @@
             <field name="model">product.product</field>
             <field name="inherit_id" ref="product.product_variant_easy_edit_view" />
            <field name="arch" type="xml">
-                    <field name="use_expiration_date" position="after">
+                    <field name="property_stock_inventory" position="after">
+                    <field name="tracking"/>
+                    <field name="use_expiration_date"/>
                         <field name="lot_abbv" attrs="{'invisible': ['|',('tracking', '=', 'serial'),('tracking', '=', 'none')]}"/>
                     </field>
                 </field>
