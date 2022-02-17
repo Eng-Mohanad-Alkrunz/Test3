@@ -2,10 +2,11 @@
 <odoo>
     <data>
         <record id="product_variant_easy_edit_view_lot_code" model="ir.ui.view">
-            <field name="model">product.template</field>
-            <field name="inherit_id" ref="mrp.mrp_product_template_search_view" />
+            <field name="name">product.product.view.form.lot_code</field>
+            <field name="model">product.product</field>
+           <field name="inherit_id" ref="product.product_variant_easy_edit_view" />
            <field name="arch" type="xml">
-                    <field name="property_stock_inventory" position="after">
+                    <field name="default_code" position="after">
                     <field name="tracking"/>
                     <field name="use_expiration_date"/>
                         <field name="lot_abbv" attrs="{'invisible': ['|',('tracking', '=', 'serial'),('tracking', '=', 'none')]}"/>
