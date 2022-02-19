@@ -6,11 +6,16 @@
             <field name="model">product.product</field>
            <field name="inherit_id" ref="product.product_normal_form_view" />
            <field name="arch" type="xml">
-                    <field name="route_ids" position="after">
-                    <field name="tracking"/>
+
+               <xpath name="route_ids" position="after">
+                    <group>
+                         <field name="tracking"/>
                     <field name="use_expiration_date"/>
                         <field name="lot_abbv" attrs="{'invisible': ['|',('tracking', '=', 'serial'),('tracking', '=', 'none')]}"/>
-                    </field>
+
+                    </group>
+                </xpath>
+
                 </field>
         </record>
 
