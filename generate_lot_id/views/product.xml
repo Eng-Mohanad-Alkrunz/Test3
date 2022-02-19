@@ -6,11 +6,11 @@
             <field name="model">product.product</field>
            <field name="inherit_id" ref="product.product_normal_form_view" />
            <field name="arch" type="xml" >
-               <button name="stock.view_diagram_button" position="after">
+               <group name="operations" position="after">
                          <field name="tracking"/>
                          <field name="lot_abbv" attrs="{'invisible': ['|',('tracking', '=', 'serial'),('tracking', '=', 'none')]}"/>
                          <field name="use_expiration_date"/>
-                </button>
+                </group>
             </field>
         </record>
 
