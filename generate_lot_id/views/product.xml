@@ -7,9 +7,12 @@
            <field name="inherit_id" ref="product.product_normal_form_view" />
            <field name="arch" type="xml" >
                <group name="operations" position="after">
-                         <field name="tracking"/>
+                   <group string="Tracking" name="tracking_sec">
+                       <field name="tracking"/>
                          <field name="lot_abbv" attrs="{'invisible': ['|',('tracking', '=', 'serial'),('tracking', '=', 'none')]}"/>
                          <field name="use_expiration_date"/>
+                   </group>
+
                 </group>
             </field>
         </record>
