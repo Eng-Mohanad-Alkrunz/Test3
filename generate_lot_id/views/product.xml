@@ -6,13 +6,12 @@
             <field name="model">product.product</field>
            <field name="inherit_id" ref="product.product_normal_form_view" />
            <field name="arch" type="xml" >
-               <field name="route_ids" position="after"/>
-                    <group>
+               <field name="route_ids" position="after">
                          <field name="tracking"/>
-                        <field name="lot_abbv" attrs="{'invisible': ['|',('tracking', '=', 'serial'),('tracking', '=', 'none')]}"/>
+                         <field name="lot_abbv" attrs="{'invisible': ['|',('tracking', '=', 'serial'),('tracking', '=', 'none')]}"/>
                          <field name="use_expiration_date"/>
-                    </group>
                 </field>
+            </field>
         </record>
 
        <record id="product_template_only_form_view_lot_code" model="ir.ui.view">
